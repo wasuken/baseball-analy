@@ -7,12 +7,21 @@
          while line
          do (setf lines (append lines (list line)))))
     lines))
-;;; ahokusa
+
 (defun read-file-to-first-line (filepath)
   (car (read-file-to-list filepath)))
 
-;;; CSVの作成
-;;; 完全にコピペ(http://d.hatena.ne.jp/masatoi/20170203/1486121334)
+(defun range (begin end &optional (step 1))
+  (cond ((<= begin end)
+		 (cons begin (range (+ begin step) end step)))
+		(t nil)))
+
+(defun list-team-and-player (player)
+  (mapcar #'(lambda (x) (cons x player))
+		  (mapcar #'princ-to-string
+				  ;; 10 is not found. 376
+				  (subst 376 10 (range 1 12)))))
+
 (defun node-text (node)
   (let ((text-list nil))
     (plump:traverse node
@@ -22,15 +31,14 @@
 
 (defun create-csv-data (page-node-tree)
   (format nil "~{~a~^~%~}"
-		  (mapcar #'(lambda (x) (format nil "~{~a~^,~}"
-										(cdr (ppcre:split #\Newline (node-text x)))))
-				  (coerce (clss:select "tr"
-									   (clss:select ".NpbPlSt" page-node-tree)) 'list))))
+		  (reverse (cdr (reverse (mapcar #'(lambda (x) (format nil "~{~a~^,~}"
+															   (cdr (ppcre:split #\Newline (node-text x)))))
+										 (coerce (clss:select "tr"
+															  (clss:select ".NpbPlSt" page-node-tree)) 'list)))))))
 
 (defun url-to-parse-tree (url)
   (plump:parse (dex:get url)))
-;;; teamは1~12
-;;; playerはp(pitcher)とb(batter)
+
 (defun create-url (team player)
   (concatenate 'string
 			   "https://baseball.yahoo.co.jp/npb/teams/"
@@ -44,3 +52,13 @@
 (defun save-csv (filepath node-tree)
   (with-open-file (out filepath :direction :output :if-exists :supersede)
 	(print (create-csv-data node-tree) out)))
+
+(defun create-all-team-player-csv (player)
+  (mapcar #'(lambda (x)
+			  (sleep 5)
+			  (save-csv (concatenate 'string
+									 "data/"
+									 (car x) "-" (cdr x)
+									 ".csv")
+						(create-baseball-page-parse-tree (car x) (cdr x))))
+		  (list-team-and-player player)))
