@@ -1,0 +1,15 @@
+#|-*- mode:lisp -*-|#
+(in-package :cl-user)
+(defpackage :lake.user
+  (:use :cl :lake :cl-syntax)
+  (:shadowing-import-from :lake
+						  :directory))
+(in-package :lake.user)
+
+(use-syntax :interpol)
+ ;;; here follow your tasks...
+(task "test" ()
+	  (ql:quickload '(:prove :clss :plump :dexador :cl-ppcre) :silent t)
+	  (load #P"baseball-analy.asd")
+	  (load #P"baseball-analy-test.asd")
+	  (asdf:test-system :baseball-analy-test))
