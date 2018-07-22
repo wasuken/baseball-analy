@@ -71,4 +71,4 @@
 								  ".csv"))))
 
 (defun line-search (search-q)
-  (car (member-if #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*"))))
+  (remove-if-not #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*")))

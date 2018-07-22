@@ -20,7 +20,9 @@
 
 (subtest "CSV操作系テスト"
   (diag "csv一行ごとに検索をかける。")
-  (like (baseball-analy:line-search "寺内 崇幸") "寺内 崇幸")
+  (like (car (baseball-analy:line-search "寺内 崇幸")) "寺内 崇幸")
+  (diag "背番号18番の選手一覧")
+  (like (car (line-search "^18,")) "^18,")
   (subtest "打率トップ10の選手レコードの選手名と打率を取得する。"
 	(diag "入力した文字列と一致するCSVのヘッダが存在するかどうか")
 	(diag "")
