@@ -21,7 +21,7 @@
 		  (mapcar #'princ-to-string
 				  ;; 10 is not found. 376
 				  (subst 376 10 (range 1 12)))))
-
+;;; ref (http://d.hatena.ne.jp/masatoi/20170203/1486121334)
 (defun node-text (node)
   (let ((text-list nil))
     (plump:traverse node
@@ -51,7 +51,7 @@
 
 (defun save-csv (filepath node-tree)
   (with-open-file (out filepath :direction :output :if-exists :supersede)
-	(print (create-csv-data node-tree) out)))
+	(format out "~A" (create-csv-data node-tree))))
 
 (defun create-all-team-player-csv (player)
   (mapcar #'(lambda (x)
@@ -62,3 +62,13 @@
 									 ".csv")
 						(create-baseball-page-parse-tree (car x) (cdr x))))
 		  (list-team-and-player player)))
+;;; can use wildcard
+(defun list-player-info (team player)
+  (mapcan #'(lambda (x) (cdr (read-file-to-list x)))
+		  (directory (concatenate 'string
+								  "data/"
+								  team "-" player
+								  ".csv"))))
+
+(defun line-search (search-q)
+  (car (member-if #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*"))))
