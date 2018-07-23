@@ -2,4 +2,4 @@
 (defpackage baseball-analy
   (:use :cl)
   (:export :save-csv :create-baseball-page-parse-tree
-		   :line-search))
+		   :row-search :read-file-to-first-line))

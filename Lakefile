@@ -9,7 +9,7 @@
 (use-syntax :interpol)
  ;;; here follow your tasks...
 (task "test" ()
-	  (ql:quickload '(:prove :clss :plump :dexador :cl-ppcre) :silent t)
+	  (ql:quickload '(:prove :clss :plump :dexador :cl-ppcre :mylib) :silent t)
 	  (load #P"baseball-analy.asd")
 	  (load #P"baseball-analy-test.asd")
 	  (asdf:test-system :baseball-analy-test))

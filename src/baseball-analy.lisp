@@ -1,26 +1,10 @@
 (in-package #:baseball-analy)
 
-(defun read-file-to-list (filepath)
-  (let ((lines '()))
-    (with-open-file (in filepath)
-      (loop for line = (read-line in nil)
-         while line
-         do (setf lines (append lines (list line)))))
-    lines))
-
-(defun read-file-to-first-line (filepath)
-  (car (read-file-to-list filepath)))
-
-(defun range (begin end &optional (step 1))
-  (cond ((<= begin end)
-		 (cons begin (range (+ begin step) end step)))
-		(t nil)))
-
 (defun list-team-and-player (player)
   (mapcar #'(lambda (x) (cons x player))
 		  (mapcar #'princ-to-string
 				  ;; 10 is not found. 376
-				  (subst 376 10 (range 1 12)))))
+				  (subst 376 10 (mylib:range 1 12)))))
 ;;; ref (http://d.hatena.ne.jp/masatoi/20170203/1486121334)
 (defun node-text (node)
   (let ((text-list nil))
@@ -51,7 +35,9 @@
 
 (defun save-csv (filepath node-tree)
   (with-open-file (out filepath :direction :output :if-exists :supersede)
-	(format out "~A" (create-csv-data node-tree))))
+	(format out "~A" (ppcre:regex-replace-all "-"
+											  (create-csv-data node-tree)
+											  "0"))))
 
 (defun create-all-team-player-csv (player)
   (mapcar #'(lambda (x)
@@ -64,11 +50,24 @@
 		  (list-team-and-player player)))
 ;;; can use wildcard
 (defun list-player-info (team player)
-  (mapcan #'(lambda (x) (cdr (read-file-to-list x)))
+  (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
 		  (directory (concatenate 'string
 								  "data/"
 								  team "-" player
 								  ".csv"))))
 
-(defun line-search (search-q)
+(defun row-search (search-q)
   (remove-if-not #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*")))
+
+(defun col-search (player col-num)
+  (let* ((header (mylib:read-file-to-first-line
+				  (concatenate 'string "data/1-" player ".csv")))
+		 (body (list-player-info "*" player)))
+	(mapcar #'(lambda (x) (nth col-num (ppcre:split "," x)))
+			(cons header body))))
+
+(mylib:take (sort  (mapcar #'list
+						   (cdr (col-search "b" 1))
+						   (cdr (col-search "b" 6))) #'(lambda (x y)
+						   (> (read-from-string (nth 1 x))
+							  (read-from-string (nth 1 y))))) 10)
