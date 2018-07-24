@@ -66,8 +66,21 @@
 	(mapcar #'(lambda (x) (nth col-num (ppcre:split "," x)))
 			(cons header body))))
 
-(mylib:take (sort  (mapcar #'list
-						   (cdr (col-search "b" 1))
-						   (cdr (col-search "b" 6))) #'(lambda (x y)
-						   (> (read-from-string (nth 1 x))
-							  (read-from-string (nth 1 y))))) 10)
+(defun list-to-csv-file (list filepath)
+  (let* ((csv-lines (mapcar #'(lambda (x)
+								(reduce #'(lambda (y z)
+											(format nil "~A,~A" y z))
+										x))
+							list))
+		 (csv (reduce #'(lambda (x y) (format nil "~A~%~A" x y)) csv-lines)))
+	(with-open-file (s filepath :direction :output)
+	  (format s csv))))
+
+;; (mylib:take (sort  (mapcar #'list
+;; 						   (cdr (col-search "b" 1))
+;; 						   (cdr (col-search "b" 5))
+;; 						   (cdr (col-search "b" 6))
+;; 						   (cdr (col-search "b" 2)))
+;; 				   #'(lambda (x y)
+;; 					   (> (read-from-string (nth 1 x))
+;; 						  (read-from-string (nth 1 y))))) 20)
