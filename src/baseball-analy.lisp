@@ -49,12 +49,17 @@
 						(create-baseball-page-parse-tree (car x) (cdr x))))
 		  (list-team-and-player player)))
 ;;; can use wildcard
-(defun list-player-info (team player)
-  (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
-		  (directory (concatenate 'string
-								  "data/"
-								  team "-" player
-								  ".csv"))))
+(defun list-player-info (team player &optional (header? nil))
+  (let* ((header (mylib:read-file-to-first-line
+				  (concatenate 'string "data/1-" player ".csv")))
+		 (body (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
+					   (directory (concatenate 'string
+											   "data/"
+											   team "-" player
+											   ".csv")))))
+	(if header?
+		(cons header body)
+		body)))
 
 (defun row-search (search-q)
   (remove-if-not #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*")))
@@ -76,11 +81,30 @@
 	(with-open-file (s filepath :direction :output)
 	  (format s csv))))
 
-;; (mylib:take (sort  (mapcar #'list
-;; 						   (cdr (col-search "b" 1))
-;; 						   (cdr (col-search "b" 5))
-;; 						   (cdr (col-search "b" 6))
-;; 						   (cdr (col-search "b" 2)))
-;; 				   #'(lambda (x y)
-;; 					   (> (read-from-string (nth 1 x))
-;; 						  (read-from-string (nth 1 y))))) 20)
+
+;;; cols   ... リスト内の番号すべて
+;;; player ... ピッチャー||バッター選択。
+(defun map-csv  (cols player)
+  (let* ((all-header (ppcre:split ","
+								  (mylib:read-file-to-first-line "data/1-b.csv")))
+		 ((header (multi-single-nth
+				   (ppcre:split ","
+								(mylib:read-file-to-first-line "data/1-b.csv"))
+				   cols))
+		  (body (col-select cols player))))))
+
+;;; どっちだよ
+(defun multi-single-nth (list cols)
+  (loop for c in cols
+	 collect (nth c list)))
+
+(defun col-select (cols list)
+  (mapcar #'(lambda (x) (loop for c in cols collect (nth c x))) list))
+
+;; (mylib:take
+;;  (sort (col-select '(1 5 6 2)
+;; 				   (mapcar #'(lambda (x) (ppcre:split "," x))
+;; 						   (list-player-info "*" "b")))
+;; 	   #'(lambda (x y)
+;; 		   (> (read-from-string (nth 1 x))
+;; 			  (read-from-string (nth 1 y))))) 20)
