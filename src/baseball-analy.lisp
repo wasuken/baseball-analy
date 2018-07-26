@@ -81,18 +81,6 @@
 	(with-open-file (s filepath :direction :output)
 	  (format s csv))))
 
-
-;;; cols   ... リスト内の番号すべて
-;;; player ... ピッチャー||バッター選択。
-(defun map-csv  (cols player)
-  (let* ((all-header (ppcre:split ","
-								  (mylib:read-file-to-first-line "data/1-b.csv")))
-		 ((header (multi-single-nth
-				   (ppcre:split ","
-								(mylib:read-file-to-first-line "data/1-b.csv"))
-				   cols))
-		  (body (col-select cols player))))))
-
 ;;; どっちだよ
 (defun multi-single-nth (list cols)
   (loop for c in cols
