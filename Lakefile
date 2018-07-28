@@ -11,5 +11,5 @@
 (task "test" ()
 	  (ql:quickload '(:prove :clss :plump :dexador :cl-ppcre :mylib) :silent t)
 	  (load #P"baseball-analy.asd")
-	  h(load #P"baseball-analy-test.asd")
+	  (load #P"baseball-analy-test.asd")
 	  (asdf:test-system :baseball-analy-test))
