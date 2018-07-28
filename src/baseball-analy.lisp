@@ -101,12 +101,12 @@
 ;;; return   ... ソートされたcsvの結果が返ってくる
 ;; (awesome-macro "b" 2  1 2 3 4 5)
 (defmacro sort-list-all-csv-data (player sort-col &rest cols)
-  `(sort (col-select (,@cols)
+  `(sort (col-select ,cols
 					 (mapcar #'(lambda (x) (ppcre:split "," x))
 							 (list-player-info "*" ,player)))
 		 #'(lambda (x y)
-			 (> (read-from-string (nth sort-col x))
-				(read-from-string (nth sort-col y))))))
+			 (> (read-from-string (nth ,sort-col x))
+				(read-from-string (nth ,sort-col y))))))
 
 ;; (mylib:take
 ;;  (sort (col-select '(1 5 6 2)
