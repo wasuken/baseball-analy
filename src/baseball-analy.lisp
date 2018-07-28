@@ -1,5 +1,5 @@
 (in-package #:baseball-analy)
-
+;;; ここからwebからデータ取得->csv保存まで
 (defun list-team-and-player (player)
   (mapcar #'(lambda (x) (cons x player))
 		  (mapcar #'princ-to-string
@@ -48,6 +48,12 @@
 									 ".csv")
 						(create-baseball-page-parse-tree (car x) (cdr x))))
 		  (list-team-and-player player)))
+
+(defun create-all-team-and-all-player-csv ()
+  (mapcar #'(lambda (x) (create-all-team-player-csv x)) '("b" "p")))
+
+;;; ここからcsv操作
+
 ;;; can use wildcard
 (defun list-player-info (team player &optional (header? nil))
   (let* ((header (mylib:read-file-to-first-line
@@ -88,6 +94,19 @@
 
 (defun col-select (cols list)
   (mapcar #'(lambda (x) (loop for c in cols collect (nth c x))) list))
+
+;;; player   ... b or p
+;;; sort-col ... sort col-number
+;;; cols     ... col-numbers
+;;; return   ... ソートされたcsvの結果が返ってくる
+;; (awesome-macro "b" 2  1 2 3 4 5)
+(defmacro sort-list-all-csv-data (player sort-col &rest cols)
+  `(sort (col-select (,@cols)
+					 (mapcar #'(lambda (x) (ppcre:split "," x))
+							 (list-player-info "*" ,player)))
+		 #'(lambda (x y)
+			 (> (read-from-string (nth sort-col x))
+				(read-from-string (nth sort-col y))))))
 
 ;; (mylib:take
 ;;  (sort (col-select '(1 5 6 2)
