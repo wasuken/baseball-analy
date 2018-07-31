@@ -56,16 +56,12 @@
 
 ;;; can use wildcard
 (defun list-player-info (team player &optional (header? nil))
-  (let* ((header (mylib:read-file-to-first-line
-				  (concatenate 'string "data/1-" player ".csv")))
-		 (body (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
+  (let* ((body (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
 					   (directory (concatenate 'string
 											   "data/"
 											   team "-" player
 											   ".csv")))))
-	(if header?
-		(cons header body)
-		body)))
+	body))
 
 (defun row-search (search-q)
   (remove-if-not #'(lambda (x) (ppcre:scan search-q x)) (list-player-info "*" "*")))
@@ -99,7 +95,7 @@
 ;;; sort-col ... sort col-number
 ;;; cols     ... col-numbers
 ;;; return   ... ソートされたcsvの結果が返ってくる
-;; (awesome-macro "b" 2  1 2 3 4 5)
+;; (sort-list-all-csv-data "b" 2  1 2 3 4 5)
 (defmacro sort-list-all-csv-data (player sort-col &rest cols)
   `(sort (col-select ',cols
 					 (mapcar #'(lambda (x) (ppcre:split "," x))
