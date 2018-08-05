@@ -104,6 +104,33 @@
 			 (> (read-from-string (nth ,sort-col x))
 				(read-from-string (nth ,sort-col y))))))
 
+(defun head-name-to-col-number (player &rest header-names)
+  (let* ((header (ppcre:split "," (mylib:read-file-to-first-line
+								   (concatenate 'string "data/1-" player ".csv")))))
+	(mapcar #'(lambda (x)
+				(position-if #'(lambda (y)
+								 (string= y x))
+							 header))
+			header-names)))
+;;; ここガバ
+;; (defmacro head-name-to-col-numberlist (player header-names)
+;;   (let ((result `(head-name-to-col-number ,player)))
+;; 	(loop for x in (cadr header-names)
+;; 	   do (setf result (append result (list x))))
+;; 	result))
+(defmacro head-name-to-col-numberlist (player header-names)
+  `(head-name-to-col-number ,player ,@header-names))
+
+(defmacro sort-list-all-csv-data-for-header-name
+	(player sort-col-name &rest col-names)
+  (let ((result `(head-name-to-col-number ,player)))
+	(loop for x in col-names
+	   do (setf result (append result (list x))))
+	`(sort-list-all-csv-data ,player
+							 ,@(head-name-to-col-number player sort-col-name)
+							 ,@(eval result))))
+
+
 ;; (mylib:take
 ;;  (sort (col-select '(1 5 6 2)
 ;; 				   (mapcar #'(lambda (x) (ppcre:split "," x))
