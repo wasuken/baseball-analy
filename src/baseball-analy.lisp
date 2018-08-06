@@ -50,7 +50,11 @@
 		  (list-team-and-player player)))
 
 (defun create-all-team-and-all-player-csv ()
+  (remove-all-csv-data)
   (mapcar #'(lambda (x) (create-all-team-player-csv x)) '("b" "p")))
+
+(defun remove-all-csv-data ()
+  (mapcar #'delete-file (directory "data/*.*")))
 
 ;;; ここからcsv操作
 
@@ -122,19 +126,10 @@
   `(head-name-to-col-number ,player ,@header-names))
 
 (defmacro sort-list-all-csv-data-for-header-name
-	(player sort-col-name &rest col-names)
+	(player sort-col &rest col-names)
   (let ((result `(head-name-to-col-number ,player)))
 	(loop for x in col-names
 	   do (setf result (append result (list x))))
 	`(sort-list-all-csv-data ,player
-							 ,@(head-name-to-col-number player sort-col-name)
+							 ,sort-col
 							 ,@(eval result))))
-
-
-;; (mylib:take
-;;  (sort (col-select '(1 5 6 2)
-;; 				   (mapcar #'(lambda (x) (ppcre:split "," x))
-;; 						   (list-player-info "*" "b")))
-;; 	   #'(lambda (x y)
-;; 		   (> (read-from-string (nth 1 x))
-;; 			  (read-from-string (nth 1 y))))) 20)

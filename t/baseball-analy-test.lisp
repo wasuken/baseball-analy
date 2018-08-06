@@ -26,13 +26,6 @@
 		 (subtest "その他テスト"
 				  (diag "入力した文字列と一致するCSVのヘッダが存在するかどうか")
 				  (is (mylib:read-file-to-first-line "data/1-b.csv")
-				   "背番号↑,選手,打率,試合,打席,打数,安打,二塁打,三塁打,本塁打,塁打,打点,得点,三振,四球,死球,犠打,犠飛,盗塁,盗塁死,併殺打,出塁率,長打率,OPS,得点圏,失策")
-				  (diag "安打数トップ１０を表示する。")
-				  ;; (mylib:take (sort  (mapcar #'list
-				  ;; 	   (cdr (col-search "b" 1))
-				  ;; 	   (cdr (col-search "b" 6))) #'(lambda (x y)
-				  ;; 							   (> (read-from-string (nth 1 x))
-				  ;; 								  (read-from-string (nth 1 y))))) 10)
-				  ))
+				   "背番号↑,選手,打率,試合,打席,打数,安打,二塁打,三塁打,本塁打,塁打,打点,得点,三振,四球,死球,犠打,犠飛,盗塁,盗塁死,併殺打,出塁率,長打率,OPS,得点圏,失策")))
 
 (finalize)
