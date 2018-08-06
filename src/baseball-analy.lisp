@@ -56,7 +56,23 @@
 (defun remove-all-csv-data ()
   (mapcar #'delete-file (directory "data/*.*")))
 
-;;; ここからcsv操作
+;;; Add one column to the file
+;;; value is all same.
+(defun add-col-to-csv-file (header val filepath)
+  (cond ((probe-file filepath)
+		 (let* ((file-map (mylib:read-file-to-list filepath))
+				(add-line (append (list (concatenate 'string header ","))
+								  (loop repeat (1- (length file-map))
+									 collect (concatenate 'string val ","))))
+				(result-file-map (mapcar #'(lambda (x y)
+											 (concatenate 'string x y))
+										 add-line
+										 file-map)))
+		   (delete-file filepath)
+		   (with-open-file (s filepath :direction :output)
+			 (format s "~{~A~%~}" result-file-map))))))
+
+;;;;;;;;;; From here csv operation
 
 ;;; can use wildcard
 (defun list-player-info (team player &optional (header? nil))
@@ -87,7 +103,7 @@
 	(with-open-file (s filepath :direction :output)
 	  (format s csv))))
 
-;;; どっちだよ
+;;; which way?????????
 (defun multi-single-nth (list cols)
   (loop for c in cols
 	 collect (nth c list)))
@@ -132,4 +148,5 @@
 	   do (setf result (append result (list x))))
 	`(sort-list-all-csv-data ,player
 							 ,sort-col
+							 ;; devil's action(kusa
 							 ,@(eval result))))
