@@ -51,14 +51,15 @@
 
 (defun create-all-team-and-all-player-csv ()
   (remove-all-csv-data)
-  (mapcar #'(lambda (x) (create-all-team-player-csv x)) '("b" "p")))
+  (mapcar #'(lambda (x) (create-all-team-player-csv x)) '("b" "p"))
+  (add-team-col-to-all-csv))
 
 (defun remove-all-csv-data ()
   (mapcar #'delete-file (directory "data/*.*")))
 
 ;;; Add one column to the file
 ;;; value is all same.
-(defun add-col-to-csv-file (header val filepath)
+(defun add-first-col-to-csv-file (header val filepath)
   (cond ((probe-file filepath)
 		 (let* ((file-map (mylib:read-file-to-list filepath))
 				(add-line (append (list (concatenate 'string header ","))
@@ -71,6 +72,13 @@
 		   (delete-file filepath)
 		   (with-open-file (s filepath :direction :output)
 			 (format s "~{~A~%~}" result-file-map))))))
+
+(defun add-team-col-to-all-csv ()
+  (mapcar #'(lambda (x)
+			  (let ((file-attr-lst
+					 (ppcre:split "-" (pathname-name (probe-file x)))))
+				(add-first-col-to-csv-file "team" (car file-attr-lst) x)))
+		  (directory "data/*.*")))
 
 ;;;;;;;;;; From here csv operation
 
@@ -148,5 +156,5 @@
 	   do (setf result (append result (list x))))
 	`(sort-list-all-csv-data ,player
 							 ,sort-col
-							 ;; devil's action(kusa
+							 ;; devil's action
 							 ,@(eval result))))
