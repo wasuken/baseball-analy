@@ -73,17 +73,37 @@
 		   (with-open-file (s filepath :direction :output)
 			 (format s "~{~A~%~}" result-file-map))))))
 
-(defun add-team-col-to-all-csv ()
+(defparameter *team-number-to-name-list*
+  '((1 . "巨人")
+	(2 . "ヤクルト")
+	(3 . "横浜")
+	(4 . "中日")
+	(5 . "阪神")
+	(6 . "広島")
+	(7 . "西武")
+	(8 . "日ハム")
+	(9 . "ロッテ")
+	(11 . "オリックス")
+	(12 . "福岡")
+	(376 . "楽天")))
+
+(defun get-team-name (number num-to-name-lst)
+  (cdar (member-if #'(lambda (x) (= number (car x))) num-to-name-lst)))
+
+(defun add-team-col-to-all-csv (&optional (team-string-p nil))
   (mapcar #'(lambda (x)
-			  (let ((file-attr-lst
-					 (ppcre:split "-" (pathname-name (probe-file x)))))
-				(add-first-col-to-csv-file "team" (car file-attr-lst) x)))
+			  (let* ((file-attr-lst
+					  (ppcre:split "-" (pathname-name (probe-file x))))
+					 (val (if team-string-p
+							  (get-team-name (car file-attr-lst) *team-number-to-name-list*)
+							  (car file-attr-lst))))
+				(add-first-col-to-csv-file "team" val x)))
 		  (directory "data/*.*")))
 
 ;;;;;;;;;; From here csv operation
 
 ;;; can use wildcard
-(defun list-player-info (team player &optional (header? nil))
+(defun list-player-info (team player)
   (let* ((body (mapcan #'(lambda (x) (cdr (mylib:read-file-to-list x)))
 					   (directory (concatenate 'string
 											   "data/"
