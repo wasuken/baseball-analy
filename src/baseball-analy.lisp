@@ -161,11 +161,6 @@
 							 header))
 			header-names)))
 ;;; ここガバ
-;; (defmacro head-name-to-col-numberlist (player header-names)
-;;   (let ((result `(head-name-to-col-number ,player)))
-;; 	(loop for x in (cadr header-names)
-;; 	   do (setf result (append result (list x))))
-;; 	result))
 (defmacro head-name-to-col-numberlist (player header-names)
   `(head-name-to-col-number ,player ,@header-names))
 
@@ -174,7 +169,7 @@
   (let ((result `(head-name-to-col-number ,player)))
 	(loop for x in col-names
 	   do (setf result (append result (list x))))
-	`(sort-list-all-csv-data ,player
-							 ,sort-col
-							 ;; devil's action
-							 ,@(eval result))))
+	`(append '(,col-names) (sort-list-all-csv-data ,player
+												,sort-col
+												;; devil's action
+												,@(eval result)))))
