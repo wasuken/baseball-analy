@@ -22,11 +22,11 @@
   (diag "csv一行ごとに検索をかける。")
   (like (car (baseball-analy:row-search "寺内 崇幸")) "寺内 崇幸")
   (diag "背番号18番の選手一覧")
-  (like (car (baseball-analy:row-search "^18,")) "^18,")
+  (like (car (baseball-analy:row-search "^1,18,")) "^1,18,")
   (subtest "その他テスト"
 	(diag "入力した文字列と一致するCSVのヘッダが存在するかどうか")
 	(is (mylib:read-file-to-first-line "data/1-b.csv")
-		"背番号↑,選手,打率,試合,打席,打数,安打,二塁打,三塁打,本塁打,塁打,打点,得点,三振,四球,死球,犠打,犠飛,盗塁,盗塁死,併殺打,出塁率,長打率,OPS,得点圏,失策"))
+		"team,背番号↑,選手,打率,試合,打席,打数,安打,二塁打,三塁打,本塁打,塁打,打点,得点,三振,四球,死球,犠打,犠飛,盗塁,盗塁死,併殺打,出塁率,長打率,OPS,得点圏,失策"))
   (subtest "csv列追加テスト"
 	(if (probe-file *test-file*)
 		(delete-file (probe-file *test-file*)))
